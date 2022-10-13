@@ -1,7 +1,12 @@
+import { useContext } from 'react'
+import { GitHubContext } from '../../contexts/GitHubContext'
+import { dateFormatter } from '../../utils/formatter'
 import { Profile } from './Profile'
 import { HomeContainer, SearchContainer, PostGrid, PostCard } from './styles'
 
 export function Home() {
+	const { posts } = useContext(GitHubContext)
+
 	return (
 		<HomeContainer>
 			<Profile />
@@ -15,55 +20,22 @@ export function Home() {
 				</form>
 			</SearchContainer>
 			<PostGrid>
-				<PostCard>
-					<div>
-						<h3>JavaScript data types and data structures</h3>
-						<span>1 day ago</span>
-					</div>
-					<p>
-						Programming languages all have built-in data structures,
-						but these often differ from one language to another.
-						This article attempts to list the built-in data
-						structures available in...
-					</p>
-				</PostCard>
-				<PostCard>
-					<div>
-						<h3>JavaScript data types and data structures</h3>
-						<span>1 day ago</span>
-					</div>
-					<p>
-						Programming languages all have built-in data structures,
-						but these often differ from one language to another.
-						This article attempts to list the built-in data
-						structures available in...
-					</p>
-				</PostCard>
-				<PostCard>
-					<div>
-						<h3>JavaScript data types and data structures</h3>
-						<span>1 day ago</span>
-					</div>
-					<p>
-						Programming languages all have built-in data structures,
-						but these often differ from one language to another.
-						This article attempts to list the built-in data
-						structures available in...
-					</p>
-				</PostCard>
-				<PostCard>
-					<div>
-						<h3>JavaScript data types and data structures</h3>
-						<span>1 day ago</span>
-					</div>
-					<p>
-						Programming languages all have built-in data structures,
-						but these often differ from one language to another.
-						This article attempts to list the built-in data
-						structures available in...
-					</p>
-				</PostCard>
-			</PostGrid>
+				{posts.map((post) => {
+					return (
+						<PostCard key={post.id}>
+							<div>
+								<h3>
+									{post.title}
+								</h3>
+								<span>{dateFormatter.format(new Date(post.created_at))}</span>
+							</div>
+							<p>
+								{post.body.substring(0,200)}...
+							</p>
+						</PostCard>
+					)
+				})}
+				</PostGrid>
 		</HomeContainer>
 	)
 }
