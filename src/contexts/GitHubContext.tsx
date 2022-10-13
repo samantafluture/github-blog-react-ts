@@ -44,9 +44,11 @@ export function GitHubProvider({ children }: GitHubProviderProps) {
 
   // gambiarra
 	const fetchPosts = useCallback(async (query?: string) => {
+    if (query === undefined) { query = "" }
+    
 		const response = await API_POST.get('', {
       params: {
-        q: 'repo:samantafluture/github-blog-react-ts'
+        q: query + 'repo:samantafluture/github-blog-react-ts'
       }
     })
     
