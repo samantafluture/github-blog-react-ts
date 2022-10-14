@@ -5,7 +5,10 @@ import {
 	ChatCircle,
 	GithubLogo,
 } from 'phosphor-react'
-import { NavLink } from 'react-router-dom'
+import { useContext, useEffect } from 'react'
+import { NavLink, useParams } from 'react-router-dom'
+import { GitHubContext } from '../../contexts/GitHubContext'
+import { dateFormatter } from '../../utils/formatter'
 import {
 	PostContainer,
 	PostInfoContainer,
@@ -15,6 +18,13 @@ import {
 } from './styles'
 
 export function Post() {
+	const { postContent, fetchPostContent } = useContext(GitHubContext)
+	const { id } = useParams()
+
+	useEffect(() => {
+		fetchPostContent(id)
+	}, [])
+	
 	return (
 		<PostContainer>
 			<PostInfoContainer>
@@ -23,53 +33,32 @@ export function Post() {
 						<CaretLeft size={16} />
 						<span>Go back</span>
 					</NavLink>
-					<a href='https://github.com/samantafluture' target='_blank'>
+					<a href={postContent.html_url} target='_blank'>
 						<span>See it on Github</span>
 						<ArrowSquareUpRight size={16} />
 					</a>
 				</PostNav>
-				<h1>JavaScript data types and data structures</h1>
+				<h1>{postContent.title}</h1>
 				<PostDetails>
 					<div>
 						<GithubLogo size={18} />
-						<span>samantafluture</span>
+						<span>{postContent.user.login}</span>
 					</div>
 					<div>
 						<CalendarBlank size={18} />
-						<span>1 day ago</span>
+						<span>
+							{dateFormatter.format(
+								new Date(postContent.created_at)
+							)}
+						</span>
 					</div>
 					<div>
 						<ChatCircle size={18} />
-						<span>5 comments</span>
+						<span>{postContent.comments} comments</span>
 					</div>
 				</PostDetails>
 			</PostInfoContainer>
-			<PostContent>
-				<p>
-					<span>
-						Programming languages all have built-in data structures,
-						but these often differ from one language to another.{' '}
-					</span>
-					This article attempts to list the built-in data structures
-					available in JavaScript and what properties they have. These
-					can be used to build other data structures. Wherever
-					possible, comparisons with other languages are drawn.
-				</p>
-				<h2>Dynamic typing </h2>
-				<p>
-					JavaScript is a loosely typed and dynamic language.
-					Variables in JavaScript are not directly associated with any
-					particular value type, and any variable can be assigned (and
-					re-assigned) values of all types:
-				</p>
-				<pre>
-					{`
-            foo = ‘bar’; // foo is now a string 
-            foo = true; // foo is now a boolean
-          `}
-				</pre>
-			</PostContent>
+			<PostContent>{postContent.body}</PostContent>
 		</PostContainer>
 	)
 }
-;``

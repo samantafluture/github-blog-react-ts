@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 export const HomeContainer = styled.main`
 	margin: -5.25rem auto 0 auto;
@@ -84,4 +85,8 @@ export const PostCard = styled.div`
 		font-size: 1rem;
 		color: ${(props) => props.theme['base-text']};
 	}
+`
+
+export const PostCardContainer = styled(Link)`
+	text-decoration: none;
 `

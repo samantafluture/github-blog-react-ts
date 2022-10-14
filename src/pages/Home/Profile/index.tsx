@@ -4,7 +4,7 @@ import {
 	GithubLogo,
 	Users,
 } from 'phosphor-react'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { GitHubContext } from '../../../contexts/GitHubContext'
 import {
 	ProfileContainer,
@@ -14,8 +14,12 @@ import {
 } from './styles'
 
 export function Profile() {
-	const { user } = useContext(GitHubContext)
+	const { user, fetchUser } = useContext(GitHubContext)
 	
+	useEffect(() => {
+    fetchUser()
+	}, [])
+
 	return (
 		<ProfileContainer>
 			<a href={user.html_url} target='_blank'>

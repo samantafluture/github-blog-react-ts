@@ -1,8 +1,16 @@
-import axios from 'axios'
-import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
-import { API_USER, USER_NAME, REPO, API_POST, SEARCH_URL } from '../lib/axios'
+import {
+	createContext,
+	ReactNode,
+	useCallback,
+	useState,
+} from 'react'
+import {
+	USER_NAME,
+	api,
+	REPO_NAME,
+} from '../service/axios'
 
-interface User {
+export interface User {
 	id: number
 	name: string
 	login: string
@@ -13,18 +21,34 @@ interface User {
 	company: string | null
 }
 
-interface Post {
+interface PostSummary {
 	id: number
+	number: number
 	title: string
 	created_at: string
 	body: string
 }
 
+export interface PostContent {
+	id: number
+	number: number
+	html_url: string
+	title: string
+	comments: number
+	created_at: string
+	body: string
+	user: {
+		login: string
+	}
+}
+
 interface GitHubContextType {
 	user: User
-	posts: Post[]
+	posts: PostSummary[]
+	postContent: PostContent
 	fetchUser: () => Promise<void>
 	fetchPosts: (query?: string) => Promise<void>
+	fetchPostContent: (id?: string) => Promise<void>
 }
 
 interface GitHubProviderProps {
@@ -35,34 +59,37 @@ export const GitHubContext = createContext({} as GitHubContextType)
 
 export function GitHubProvider({ children }: GitHubProviderProps) {
 	const [user, setUser] = useState<User>({} as User)
-	const [posts, setPosts] = useState<Post[]>([])
+	const [posts, setPosts] = useState<PostSummary[]>([])
+	const [postContent, setPostContent] = useState<PostContent>(
+		{} as PostContent
+	)
 
 	const fetchUser = async () => {
-		const response = await API_USER.get(USER_NAME)
+		const response = await api.get(`users/${USER_NAME}`)
 		setUser(response.data)
 	}
 
-  // gambiarra
-	const fetchPosts = useCallback(async (query?: string) => {
-    if (query === undefined) { query = "" }
-    
-		const response = await API_POST.get('', {
-      params: {
-        q: query + 'repo:samantafluture/github-blog-react-ts'
-      }
-    })
-    
-    console.log(response.data.items)
+	const fetchPosts = useCallback(async (query: string = '') => {
+		const response = await api.get(`/search/issues?q=${query}%20repo:${USER_NAME}/${REPO_NAME}`)
 		setPosts(response.data.items)
-	}, [])
+	}, [posts])
 
-	useEffect(() => {
-		fetchUser()
-    fetchPosts()
-	}, [fetchPosts])
+	const fetchPostContent = useCallback(async (id?: string) => {
+    const response = await api.get(`/repos/${USER_NAME}/${REPO_NAME}/issues/${id}`)
+		setPostContent(response.data)
+	},  [postContent])
 
 	return (
-		<GitHubContext.Provider value={{ user, posts, fetchUser, fetchPosts }}>
+		<GitHubContext.Provider
+			value={{
+				user,
+				postContent,
+				posts,
+				fetchUser,
+				fetchPosts,
+				fetchPostContent,
+			}}
+		>
 			{children}
 		</GitHubContext.Provider>
 	)
